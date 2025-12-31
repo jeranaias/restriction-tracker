@@ -1,8 +1,12 @@
 /**
  * Main application for Restriction Tracker
  * Initializes and coordinates all modules
+ * Version 1.1.0
  */
 const App = {
+  VERSION: '1.1.0',
+  FIRST_RUN_KEY: 'restriction-tracker-welcomed',
+
   // Current state
   currentView: 'roster',
   currentRestrictee: null,
@@ -19,6 +23,12 @@ const App = {
 
     // Set up event listeners
     this.bindEvents();
+    this.bindKeyboardShortcuts();
+
+    // Check for first run
+    if (!localStorage.getItem(this.FIRST_RUN_KEY)) {
+      this.showWelcomeModal();
+    }
 
     // Load initial view
     this.renderRoster();
@@ -31,6 +41,11 @@ const App = {
 
     // Update roster periodically for muster status
     setInterval(() => this.updateRosterStatus(), 60000);
+
+    // Online/offline detection
+    this.setupOfflineDetection();
+
+    console.log(`Restriction Tracker v${this.VERSION} initialized`);
   },
 
   /**
@@ -82,6 +97,17 @@ const App = {
     });
     document.getElementById('clear-data-btn').addEventListener('click', () => this.confirmClearData());
 
+    // Data management buttons
+    document.getElementById('export-data-btn').addEventListener('click', () => this.exportData());
+    document.getElementById('import-data-btn').addEventListener('click', () => {
+      document.getElementById('import-file-input').click();
+    });
+    document.getElementById('import-file-input').addEventListener('change', (e) => this.importData(e));
+    document.getElementById('load-demo-btn').addEventListener('click', () => {
+      this.loadDemoData();
+      this.hideSettingsModal();
+    });
+
     // Theme radio buttons in settings
     document.querySelectorAll('input[name="theme"]').forEach(radio => {
       radio.addEventListener('change', (e) => {
@@ -93,6 +119,17 @@ const App = {
     document.getElementById('confirm-cancel-btn').addEventListener('click', () => this.hideConfirmModal());
     document.getElementById('confirm-ok-btn').addEventListener('click', () => this.handleConfirm());
 
+    // Help modal
+    document.getElementById('help-close-btn').addEventListener('click', () => this.hideHelpModal());
+    document.getElementById('help-ok-btn').addEventListener('click', () => this.hideHelpModal());
+
+    // Welcome modal
+    document.getElementById('welcome-start-btn').addEventListener('click', () => this.hideWelcomeModal());
+    document.getElementById('welcome-demo-btn').addEventListener('click', () => {
+      this.loadDemoData();
+      this.hideWelcomeModal();
+    });
+
     // Close modals on overlay click
     document.getElementById('settings-modal').addEventListener('click', (e) => {
       if (e.target.id === 'settings-modal') this.hideSettingsModal();
@@ -100,11 +137,92 @@ const App = {
     document.getElementById('confirm-modal').addEventListener('click', (e) => {
       if (e.target.id === 'confirm-modal') this.hideConfirmModal();
     });
+    document.getElementById('help-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'help-modal') this.hideHelpModal();
+    });
+    document.getElementById('welcome-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'welcome-modal') this.hideWelcomeModal();
+    });
+  },
+
+  /**
+   * Bind keyboard shortcuts
+   */
+  bindKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+      // Don't trigger shortcuts when typing in inputs
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+        if (e.key === 'Escape') {
+          e.target.blur();
+        }
+        return;
+      }
+
+      // Check for modals
+      const hasActiveModal = document.querySelector('.modal-overlay--active');
+
+      switch (e.key.toLowerCase()) {
+        case 'n':
+          if (!hasActiveModal) {
+            e.preventDefault();
+            this.showFormView();
+          }
+          break;
+        case 'r':
+          if (!hasActiveModal) {
+            e.preventDefault();
+            this.showReportView();
+          }
+          break;
+        case 's':
+          if (!hasActiveModal) {
+            e.preventDefault();
+            this.showSettingsModal();
+          }
+          break;
+        case 't':
+          if (!hasActiveModal) {
+            e.preventDefault();
+            ThemeManager.toggle();
+          }
+          break;
+        case '?':
+          e.preventDefault();
+          if (hasActiveModal) {
+            this.hideAllModals();
+          }
+          this.showHelpModal();
+          break;
+        case 'escape':
+          if (hasActiveModal) {
+            this.hideAllModals();
+          } else if (this.currentView !== 'roster') {
+            this.showRosterView();
+          }
+          break;
+      }
+    });
+  },
+
+  /**
+   * Setup offline detection
+   */
+  setupOfflineDetection() {
+    const updateOnlineStatus = () => {
+      if (!navigator.onLine) {
+        this.showToast('You are offline. Data is saved locally.', 'warning');
+      }
+    };
+
+    window.addEventListener('online', () => {
+      this.showToast('Back online', 'success');
+    });
+
+    window.addEventListener('offline', updateOnlineStatus);
   },
 
   /**
    * Show a specific view
-   * @param {string} viewId - View element ID
    */
   showView(viewId) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('view--active'));
@@ -122,21 +240,18 @@ const App = {
 
   /**
    * Show form view for adding/editing
-   * @param {string} id - Optional restrictee ID for editing
    */
   showFormView(id = null) {
     this.editingId = id;
     this.customMusterTimes = [];
 
     if (id) {
-      // Edit mode
       const restrictee = Roster.getById(id);
       if (!restrictee) return;
 
       document.getElementById('form-title').textContent = 'Edit Restrictee';
       this.populateForm(restrictee);
     } else {
-      // Add mode
       document.getElementById('form-title').textContent = 'Add Restrictee';
       this.resetForm();
     }
@@ -146,8 +261,6 @@ const App = {
 
   /**
    * Show sign-in view
-   * @param {string} restricteeId - Restrictee ID
-   * @param {string} musterTime - Muster time in HHMM format
    */
   showSignInView(restricteeId, musterTime) {
     const restrictee = Roster.getById(restricteeId);
@@ -156,18 +269,14 @@ const App = {
     this.currentRestrictee = restrictee;
     this.currentMusterTime = musterTime;
 
-    // Populate person info
     const personInfo = document.getElementById('signin-person-info');
     personInfo.innerHTML = `
       <h2 class="signin-person__name">${Roster.getDisplayName(restrictee)}</h2>
       <p class="signin-person__muster">${DateUtils.formatTimeDisplay(musterTime)} Muster</p>
     `;
 
-    // Set default recorder from settings
     const settings = Storage.getAppData().settings;
     document.getElementById('signin-recorder').value = settings.defaultRecorder || '';
-
-    // Hide notes by default
     document.getElementById('signin-notes-group').classList.add('hidden');
     document.getElementById('signin-notes').value = '';
 
@@ -176,7 +285,6 @@ const App = {
 
   /**
    * Show detail view for a restrictee
-   * @param {string} restricteeId - Restrictee ID
    */
   showDetailView(restricteeId) {
     const restrictee = Roster.getById(restricteeId);
@@ -215,17 +323,13 @@ const App = {
     } else {
       emptyState.classList.add('hidden');
       rosterList.innerHTML = active.map(r => this.renderRosterCard(r)).join('');
-
-      // Bind roster card events
       this.bindRosterCardEvents();
     }
 
-    // Completed section
     if (completed.length > 0) {
       completedSection.classList.remove('hidden');
       document.getElementById('completed-toggle').querySelector('span').textContent =
         `Completed Restrictions (${completed.length})`;
-
       document.getElementById('completed-list').innerHTML =
         completed.map(r => this.renderRosterCard(r, true)).join('');
     } else {
@@ -235,9 +339,6 @@ const App = {
 
   /**
    * Render a single roster card
-   * @param {Object} restrictee - Restrictee object
-   * @param {boolean} isCompleted - Whether this is a completed restriction
-   * @returns {string} - HTML string
    */
   renderRosterCard(restrictee, isCompleted = false) {
     const status = Roster.getStatus(restrictee);
@@ -270,7 +371,7 @@ const App = {
       : '';
 
     return `
-      <div class="roster-card" data-id="${restrictee.id}">
+      <div class="roster-card fade-in" data-id="${restrictee.id}">
         <div class="roster-card__header">
           <span class="roster-card__status ${status.statusClass}">${status.statusIcon}</span>
           <div class="roster-card__info">
@@ -316,7 +417,7 @@ const App = {
   },
 
   /**
-   * Update roster status (called periodically)
+   * Update roster status
    */
   updateRosterStatus() {
     if (this.currentView === 'roster') {
@@ -342,18 +443,13 @@ const App = {
     document.getElementById('person-startdate').value = DateUtils.today();
     document.getElementById('person-days').value = '30';
     this.updateEndDate();
-
-    // Reset muster checkboxes
     document.querySelectorAll('.muster-time-cb').forEach(cb => cb.checked = true);
-
-    // Clear custom times
     this.customMusterTimes = [];
     this.renderCustomMusterTimes();
   },
 
   /**
    * Populate form with restrictee data
-   * @param {Object} restrictee - Restrictee object
    */
   populateForm(restrictee) {
     document.getElementById('person-rank').value = restrictee.rank;
@@ -363,10 +459,8 @@ const App = {
     document.getElementById('person-edipi').value = restrictee.edipi || '';
     document.getElementById('person-unit').value = restrictee.unit || '';
 
-    // Restriction type
     document.querySelector(`input[name="restriction-type"][value="${restrictee.restrictionType}"]`).checked = true;
 
-    // Dates
     document.getElementById('person-startdate').value = restrictee.startDate;
     document.getElementById('person-days').value = restrictee.daysAwarded;
     document.getElementById('person-enddate').value = restrictee.endDate;
@@ -374,13 +468,11 @@ const App = {
     document.getElementById('person-offense').value = restrictee.offense || '';
     document.getElementById('person-notes').value = restrictee.notes || '';
 
-    // Muster times
     const standardTimes = ['0600', '1200', '1800', '2200'];
     document.querySelectorAll('.muster-time-cb').forEach(cb => {
       cb.checked = restrictee.musterTimes.includes(cb.value);
     });
 
-    // Custom times
     this.customMusterTimes = restrictee.musterTimes.filter(t => !standardTimes.includes(t));
     this.renderCustomMusterTimes();
   },
@@ -407,10 +499,7 @@ const App = {
 
     if (!time) return;
 
-    // Convert HH:MM to HHMM
     const hhmm = time.replace(':', '');
-
-    // Check if already exists
     const allTimes = this.getAllSelectedMusterTimes();
     if (allTimes.includes(hhmm)) {
       this.showToast('This time is already selected', 'warning');
@@ -424,7 +513,6 @@ const App = {
 
   /**
    * Remove custom muster time
-   * @param {string} time - Time in HHMM format
    */
   removeCustomMusterTime(time) {
     this.customMusterTimes = this.customMusterTimes.filter(t => t !== time);
@@ -451,7 +539,6 @@ const App = {
 
   /**
    * Get all selected muster times
-   * @returns {string[]} - Array of times in HHMM format
    */
   getAllSelectedMusterTimes() {
     const standard = [];
@@ -464,7 +551,7 @@ const App = {
   },
 
   /**
-   * Save person (add or update)
+   * Save person
    */
   savePerson() {
     const formData = {
@@ -503,7 +590,6 @@ const App = {
 
   /**
    * Record muster sign-in
-   * @param {string} status - Muster status
    */
   recordMuster(status) {
     const recorder = document.getElementById('signin-recorder').value.trim();
@@ -516,7 +602,6 @@ const App = {
     }
 
     if ((status === 'late' || status === 'missed' || status === 'excused') && !notes) {
-      // Show notes field and prompt
       document.getElementById('signin-notes-group').classList.remove('hidden');
       document.getElementById('signin-notes').focus();
       this.showToast('Please add a note for this status', 'warning');
@@ -538,7 +623,6 @@ const App = {
 
   /**
    * Render detail view content
-   * @param {Object} restrictee - Restrictee object
    */
   renderDetailContent(restrictee) {
     const container = document.getElementById('detail-content');
@@ -573,11 +657,9 @@ const App = {
       </div>
     `;
 
-    // Get grouped records
     const recordsByDate = Muster.getRecordsGroupedByDate(restrictee.id, 14);
     const today = DateUtils.today();
 
-    // Always show today
     if (!recordsByDate[today]) {
       recordsByDate[today] = [];
     }
@@ -683,40 +765,204 @@ const App = {
     this.showToast('Report downloaded', 'success');
   },
 
+  // ===================
+  // Data Import/Export
+  // ===================
+
   /**
-   * Show settings modal
+   * Export all data as JSON
    */
+  exportData() {
+    const data = Storage.getAppData();
+    data.exportedAt = new Date().toISOString();
+    data.version = this.VERSION;
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `restriction-tracker-backup-${DateUtils.formatNumeric(new Date())}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    this.showToast('Data exported successfully', 'success');
+  },
+
+  /**
+   * Import data from JSON file
+   */
+  importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+
+        if (!data.restrictees || !Array.isArray(data.restrictees)) {
+          throw new Error('Invalid data format');
+        }
+
+        this.confirmAction(
+          'Import Data',
+          `This will replace all current data with ${data.restrictees.length} restrictees and ${(data.musterRecords || []).length} muster records. Continue?`,
+          () => {
+            Storage.saveAppData(data);
+            this.showRosterView();
+            this.hideSettingsModal();
+            this.showToast('Data imported successfully', 'success');
+          }
+        );
+      } catch (err) {
+        this.showToast('Invalid file format', 'error');
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  },
+
+  /**
+   * Load demo data
+   */
+  loadDemoData() {
+    const today = DateUtils.today();
+    const yesterday = DateUtils.formatISO(DateUtils.addDays(today, -1));
+
+    const demoData = {
+      restrictees: [
+        {
+          id: 'demo-1',
+          rank: 'PFC',
+          lastName: 'SMITH',
+          firstName: 'John',
+          mi: 'A',
+          edipi: '',
+          unit: '1st Plt, Alpha Co',
+          restrictionType: 'restriction',
+          startDate: DateUtils.formatISO(DateUtils.addDays(today, -15)),
+          endDate: DateUtils.formatISO(DateUtils.addDays(today, 14)),
+          daysAwarded: 30,
+          offense: 'Article 92 - Failure to obey order',
+          musterTimes: ['0600', '1200', '1800', '2200'],
+          notes: '',
+          active: true,
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: 'demo-2',
+          rank: 'LCpl',
+          lastName: 'JONES',
+          firstName: 'Maria',
+          mi: 'T',
+          edipi: '',
+          unit: '2nd Plt, Alpha Co',
+          restrictionType: 'restriction',
+          startDate: DateUtils.formatISO(DateUtils.addDays(today, -3)),
+          endDate: DateUtils.formatISO(DateUtils.addDays(today, 10)),
+          daysAwarded: 14,
+          offense: '',
+          musterTimes: ['0600', '1200', '1800', '2200'],
+          notes: '',
+          active: true,
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: 'demo-3',
+          rank: 'Cpl',
+          lastName: 'DAVIS',
+          firstName: 'Robert',
+          mi: 'L',
+          edipi: '',
+          unit: '3rd Plt, Bravo Co',
+          restrictionType: 'epd',
+          startDate: DateUtils.formatISO(DateUtils.addDays(today, -6)),
+          endDate: DateUtils.formatISO(DateUtils.addDays(today, 0)),
+          daysAwarded: 7,
+          offense: '',
+          musterTimes: ['0600', '1800'],
+          notes: 'EPD only - no 1200/2200 muster required',
+          active: true,
+          createdAt: new Date().toISOString()
+        }
+      ],
+      musterRecords: [
+        // Yesterday's records for demo-1
+        { id: 'rec-1', restricteeId: 'demo-1', date: yesterday, scheduledTime: '0600', actualTime: '0555', status: 'present', recordedBy: 'SGT Martinez', notes: '', timestamp: new Date().toISOString() },
+        { id: 'rec-2', restricteeId: 'demo-1', date: yesterday, scheduledTime: '1200', actualTime: '1158', status: 'present', recordedBy: 'SSgt Garcia', notes: '', timestamp: new Date().toISOString() },
+        { id: 'rec-3', restricteeId: 'demo-1', date: yesterday, scheduledTime: '1800', actualTime: null, status: 'missed', recordedBy: 'GySgt Johnson', notes: 'At dental appointment - unexcused', timestamp: new Date().toISOString() },
+        { id: 'rec-4', restricteeId: 'demo-1', date: yesterday, scheduledTime: '2200', actualTime: '2145', status: 'present', recordedBy: 'SSgt Garcia', notes: '', timestamp: new Date().toISOString() },
+        // Today's records for demo-1
+        { id: 'rec-5', restricteeId: 'demo-1', date: today, scheduledTime: '0600', actualTime: '0558', status: 'present', recordedBy: 'SGT Martinez', notes: '', timestamp: new Date().toISOString() },
+        // Yesterday's records for demo-2
+        { id: 'rec-6', restricteeId: 'demo-2', date: yesterday, scheduledTime: '0600', actualTime: '0602', status: 'present', recordedBy: 'SGT Martinez', notes: '', timestamp: new Date().toISOString() },
+        { id: 'rec-7', restricteeId: 'demo-2', date: yesterday, scheduledTime: '1200', actualTime: '1215', status: 'late', recordedBy: 'SSgt Garcia', notes: 'At medical appointment', timestamp: new Date().toISOString() },
+        { id: 'rec-8', restricteeId: 'demo-2', date: yesterday, scheduledTime: '1800', actualTime: '1758', status: 'present', recordedBy: 'GySgt Johnson', notes: '', timestamp: new Date().toISOString() },
+        { id: 'rec-9', restricteeId: 'demo-2', date: yesterday, scheduledTime: '2200', actualTime: '2155', status: 'present', recordedBy: 'SSgt Garcia', notes: '', timestamp: new Date().toISOString() },
+      ],
+      settings: {
+        defaultMusterTimes: ['0600', '1200', '1800', '2200'],
+        unitName: '1st Battalion, 5th Marines',
+        defaultRecorder: 'SSgt Garcia'
+      },
+      lastUpdated: new Date().toISOString()
+    };
+
+    Storage.saveAppData(demoData);
+    this.showRosterView();
+    this.showToast('Demo data loaded', 'success');
+  },
+
+  // ===================
+  // Modal Management
+  // ===================
+
   showSettingsModal() {
     const settings = Storage.getAppData().settings;
     document.getElementById('settings-unit').value = settings.unitName || '';
     document.getElementById('settings-recorder').value = settings.defaultRecorder || '';
 
-    // Set theme radio
     const currentTheme = ThemeManager.getCurrent();
     document.querySelector(`input[name="theme"][value="${currentTheme}"]`).checked = true;
 
     document.getElementById('settings-modal').classList.add('modal-overlay--active');
   },
 
-  /**
-   * Hide settings modal
-   */
   hideSettingsModal() {
     document.getElementById('settings-modal').classList.remove('modal-overlay--active');
   },
 
-  /**
-   * Load settings into form
-   */
+  showHelpModal() {
+    document.getElementById('help-modal').classList.add('modal-overlay--active');
+  },
+
+  hideHelpModal() {
+    document.getElementById('help-modal').classList.remove('modal-overlay--active');
+  },
+
+  showWelcomeModal() {
+    document.getElementById('welcome-modal').classList.add('modal-overlay--active');
+  },
+
+  hideWelcomeModal() {
+    document.getElementById('welcome-modal').classList.remove('modal-overlay--active');
+    localStorage.setItem(this.FIRST_RUN_KEY, 'true');
+  },
+
+  hideAllModals() {
+    document.querySelectorAll('.modal-overlay--active').forEach(modal => {
+      modal.classList.remove('modal-overlay--active');
+    });
+  },
+
   loadSettings() {
     const settings = Storage.getAppData().settings;
     document.getElementById('settings-unit').value = settings.unitName || '';
     document.getElementById('settings-recorder').value = settings.defaultRecorder || '';
   },
 
-  /**
-   * Save settings
-   */
   saveSettings() {
     const data = Storage.getAppData();
     data.settings.unitName = document.getElementById('settings-unit').value.trim();
@@ -727,9 +973,6 @@ const App = {
     this.showToast('Settings saved', 'success');
   },
 
-  /**
-   * Confirm clear data
-   */
   confirmClearData() {
     this.confirmAction(
       'Clear All Data',
@@ -743,12 +986,6 @@ const App = {
     );
   },
 
-  /**
-   * Show confirm modal
-   * @param {string} title - Modal title
-   * @param {string} message - Confirmation message
-   * @param {Function} onConfirm - Callback on confirm
-   */
   confirmAction(title, message, onConfirm) {
     this.pendingConfirmAction = onConfirm;
     document.getElementById('confirm-title').textContent = title;
@@ -756,17 +993,11 @@ const App = {
     document.getElementById('confirm-modal').classList.add('modal-overlay--active');
   },
 
-  /**
-   * Hide confirm modal
-   */
   hideConfirmModal() {
     document.getElementById('confirm-modal').classList.remove('modal-overlay--active');
     this.pendingConfirmAction = null;
   },
 
-  /**
-   * Handle confirm button click
-   */
   handleConfirm() {
     if (this.pendingConfirmAction) {
       this.pendingConfirmAction();
@@ -774,11 +1005,6 @@ const App = {
     this.hideConfirmModal();
   },
 
-  /**
-   * Show toast notification
-   * @param {string} message - Toast message
-   * @param {string} type - Toast type (success, error, warning)
-   */
   showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
@@ -795,5 +1021,5 @@ const App = {
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => App.init());
 
-// Make App available globally for inline handlers
+// Make App available globally
 window.App = App;

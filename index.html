@@ -2,14 +2,30 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Digital muster log for personnel on restriction or EPD punishment. Mobile-friendly sign-in tracking for USMC units.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Free digital muster log for USMC personnel on restriction or EPD. Mobile-friendly sign-in tracking with PDF export. No installation, no account required.">
+  <meta name="keywords" content="USMC, Marine Corps, restriction, EPD, muster, sign-in, tracker, military, NJP, Article 15">
+  <meta name="author" content="USMC Tools">
+  <meta name="robots" content="index, follow">
   <title>Restriction Tracker - USMC Tools</title>
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Restriction Tracker - USMC Tools">
+  <meta property="og:description" content="Free digital muster log for personnel on restriction or EPD. Mobile-friendly, works offline.">
+  <meta property="og:url" content="https://jeranaias.github.io/restriction-tracker/">
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#8B0000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Restriction">
   <link rel="apple-touch-icon" href="assets/icon-192.svg">
+
+  <!-- Preload critical resources -->
+  <link rel="preload" href="css/styles.css" as="style">
+  <link rel="preload" href="lib/jspdf.umd.min.js" as="script">
 
   <!-- Styles -->
   <link rel="stylesheet" href="css/styles.css">
@@ -446,6 +462,36 @@
           </button>
         </div>
         <div class="form-group">
+          <label class="label">Data Management</label>
+          <div class="btn-group-vertical">
+            <button type="button" class="btn btn--outline btn--full" id="export-data-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Export Data (JSON)
+            </button>
+            <button type="button" class="btn btn--outline btn--full" id="import-data-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              Import Data (JSON)
+            </button>
+            <input type="file" id="import-file-input" accept=".json" class="hidden">
+            <button type="button" class="btn btn--secondary btn--full" id="load-demo-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polygon points="10 8 16 12 10 16 10 8"></polygon>
+              </svg>
+              Load Demo Data
+            </button>
+          </div>
+        </div>
+        <hr>
+        <div class="form-group">
           <button type="button" class="btn btn--danger btn--full" id="clear-data-btn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="3 6 5 6 21 6"></polyline>
@@ -456,6 +502,7 @@
         </div>
       </div>
       <div class="modal__footer">
+        <p class="text-xs text-secondary">Keyboard: <kbd>N</kbd> New &bull; <kbd>?</kbd> Help &bull; <kbd>Esc</kbd> Close</p>
         <button type="button" class="btn btn--primary" id="settings-save-btn">Save Settings</button>
       </div>
     </div>
@@ -477,6 +524,93 @@
     </div>
   </div>
 
+  <!-- Help Modal -->
+  <div class="modal-overlay" id="help-modal">
+    <div class="modal">
+      <div class="modal__header">
+        <h2 class="modal__title">Keyboard Shortcuts</h2>
+        <button type="button" class="btn btn--ghost" id="help-close-btn" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <div class="shortcuts-grid">
+          <div class="shortcut"><kbd>N</kbd> <span>Add new restrictee</span></div>
+          <div class="shortcut"><kbd>R</kbd> <span>View daily report</span></div>
+          <div class="shortcut"><kbd>S</kbd> <span>Open settings</span></div>
+          <div class="shortcut"><kbd>T</kbd> <span>Toggle theme</span></div>
+          <div class="shortcut"><kbd>?</kbd> <span>Show this help</span></div>
+          <div class="shortcut"><kbd>Esc</kbd> <span>Close modal / Go back</span></div>
+        </div>
+        <hr>
+        <h3 class="text-sm font-bold mb-4">About This Tool</h3>
+        <p class="text-sm text-secondary mb-4">
+          Restriction Tracker is a free, open-source tool for tracking muster sign-ins for personnel on restriction or EPD.
+          All data stays on your device - nothing is sent to any server.
+        </p>
+        <div class="alert alert--warning">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span>For UNCLASSIFIED use only. Never enter classified information.</span>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <a href="https://github.com/jeranaias/restriction-tracker" target="_blank" class="btn btn--outline">View on GitHub</a>
+        <button type="button" class="btn btn--primary" id="help-ok-btn">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Welcome Modal (First Run) -->
+  <div class="modal-overlay" id="welcome-modal">
+    <div class="modal">
+      <div class="modal__header">
+        <h2 class="modal__title">Welcome to Restriction Tracker</h2>
+      </div>
+      <div class="modal__body">
+        <p class="mb-4">A free, mobile-friendly tool for tracking muster sign-ins for personnel on restriction or EPD punishment.</p>
+
+        <div class="feature-list">
+          <div class="feature-item">
+            <span class="feature-icon">&#128274;</span>
+            <div>
+              <strong>100% Private</strong>
+              <p class="text-sm text-secondary">All data stays on your device. Nothing is sent to any server.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">&#128247;</span>
+            <div>
+              <strong>Works Offline</strong>
+              <p class="text-sm text-secondary">Once loaded, works without internet. Perfect for duty.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">&#128196;</span>
+            <div>
+              <strong>PDF Export</strong>
+              <p class="text-sm text-secondary">Generate print-ready daily logs and history reports.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert--info mt-4">
+          <span>Tip: Load demo data to see how it works before adding real personnel.</span>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button type="button" class="btn btn--outline" id="welcome-demo-btn">Load Demo Data</button>
+        <button type="button" class="btn btn--primary" id="welcome-start-btn">Get Started</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notifications -->
   <div id="toast-container" class="toast-container"></div>
 
@@ -492,8 +626,8 @@
     </div>
   </footer>
 
-  <!-- Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Scripts (bundled locally for offline support) -->
+  <script src="lib/jspdf.umd.min.js"></script>
   <script src="js/lib/storage.js"></script>
   <script src="js/lib/date-utils.js"></script>
   <script src="js/lib/theme.js"></script>

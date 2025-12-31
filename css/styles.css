@@ -1481,3 +1481,160 @@ legend {
     width: 100%;
   }
 }
+
+/* ============================================
+   Enhanced UI Elements
+   ============================================ */
+
+/* Button Group Vertical */
+.btn-group-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Keyboard Shortcuts */
+kbd {
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 1px 0 var(--border-dark);
+}
+
+.shortcuts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.shortcut {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.shortcut kbd {
+  min-width: 28px;
+  text-align: center;
+}
+
+/* Feature List (Welcome Modal) */
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.feature-icon {
+  font-size: var(--text-2xl);
+  line-height: 1;
+}
+
+/* Version Badge */
+.version-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+/* Loading Spinner */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-light);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Pulse Animation for Alerts */
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Fade In Animation */
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Status Dot */
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot--success { background: var(--success); }
+.status-dot--warning { background: var(--warning); }
+.status-dot--error { background: var(--error); }
+.status-dot--pending { background: var(--gray-400); }
+
+/* Offline Indicator */
+.offline-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--warning);
+  color: var(--gray-900);
+  text-align: center;
+  padding: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  z-index: 2000;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+
+.offline-indicator.visible {
+  transform: translateY(0);
+}
+
+/* Additional utility classes */
+.mb-4 { margin-bottom: var(--space-4); }
+.mt-4 { margin-top: var(--space-4); }
+.text-xs { font-size: var(--text-xs); }
+.font-bold { font-weight: var(--font-bold); }
+
+/* Print improvements */
+@media print {
+  .report-content {
+    break-inside: avoid;
+  }
+
+  .report-person {
+    break-inside: avoid;
+  }
+}

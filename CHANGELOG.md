@@ -5,6 +5,40 @@ All notable changes to the Restriction Tracker will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-12-31
+
+### Added
+- **Welcome Modal** - First-run experience with option to load demo data
+- **Demo Mode** - Sample restrictees and muster data for training/evaluation
+- **Data Export** - Download all app data as JSON backup file
+- **Data Import** - Restore data from previously exported JSON file
+- **Keyboard Shortcuts** - Full keyboard navigation for power users
+  - `N` - Add new person
+  - `R` - Go to roster view
+  - `S` - Open settings
+  - `T` - Toggle theme
+  - `?` - Show keyboard shortcuts
+  - `Esc` - Close modal / Go back
+- **Help Modal** - In-app keyboard shortcuts reference
+- **Offline Indicator** - Visual notification when app goes offline
+- **SEO Files** - robots.txt and sitemap.xml for search engines
+
+### Changed
+- **Bundled jsPDF Locally** - PDF generation now works fully offline (no CDN dependency)
+- **Enhanced Service Worker** - Improved cache-first strategy with version management
+- **Updated README** - Comprehensive documentation with FAQ, keyboard shortcuts, and usage guide
+- **Better Settings Panel** - Added export/import buttons and help link
+
+### Technical
+- Service worker version bumped to 1.1.0
+- Added preload hints for critical resources
+- Added Open Graph meta tags for better link previews
+- Improved modal management system
+- Added CSS animations (fadeIn, pulse, spin)
+- Added kbd element styling for keyboard shortcuts display
+
+---
+
 ## [1.0.0] - 2025-12-31
 
 ### Added

@@ -1,24 +1,25 @@
 /**
  * Service Worker for Restriction Tracker PWA
- * Enables offline functionality
+ * Enables offline functionality with cache-first strategy
+ * Version 1.1.0
  */
 
-const CACHE_NAME = 'restriction-tracker-v1';
+const CACHE_NAME = 'restriction-tracker-v1.1.0';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/css/styles.css',
-  '/js/app.js',
-  '/js/roster.js',
-  '/js/muster.js',
-  '/js/reports.js',
-  '/js/lib/storage.js',
-  '/js/lib/date-utils.js',
-  '/js/lib/theme.js',
-  '/assets/icon-192.svg',
-  '/assets/icon-512.svg',
-  '/manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+  './',
+  './index.html',
+  './css/styles.css',
+  './js/app.js',
+  './js/roster.js',
+  './js/muster.js',
+  './js/reports.js',
+  './js/lib/storage.js',
+  './js/lib/date-utils.js',
+  './js/lib/theme.js',
+  './lib/jspdf.umd.min.js',
+  './assets/icon-192.svg',
+  './assets/icon-512.svg',
+  './manifest.json'
 ];
 
 // Install event - cache files
@@ -26,11 +27,11 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
+        console.log('[SW] Caching app shell');
         return cache.addAll(urlsToCache);
       })
       .catch(err => {
-        console.log('Cache install failed:', err);
+        console.error('[SW] Cache install failed:', err);
       })
   );
   // Activate immediately
@@ -44,7 +45,7 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
+            console.log('[SW] Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -55,8 +56,14 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch event - serve from cache, fallback to network
+// Fetch event - cache-first strategy
 self.addEventListener('fetch', event => {
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') return;
+
+  // Skip cross-origin requests
+  if (!event.request.url.startsWith(self.location.origin)) return;
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -70,7 +77,7 @@ self.addEventListener('fetch', event => {
 
         return fetch(fetchRequest).then(response => {
           // Check if valid response
-          if (!response || response.status !== 200 || response.type !== 'basic') {
+          if (!response || response.status !== 200) {
             return response;
           }
 
@@ -85,21 +92,19 @@ self.addEventListener('fetch', event => {
 
           return response;
         }).catch(() => {
-          // Return offline page if available
+          // Return offline page for navigation requests
           if (event.request.mode === 'navigate') {
-            return caches.match('/index.html');
+            return caches.match('./index.html');
           }
+          return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
         });
       })
   );
 });
 
-// Background sync for when offline
-self.addEventListener('sync', event => {
-  if (event.tag === 'sync-muster') {
-    event.waitUntil(
-      // Future: sync data with server
-      Promise.resolve()
-    );
+// Message handler for cache updates
+self.addEventListener('message', event => {
+  if (event.data === 'skipWaiting') {
+    self.skipWaiting();
   }
 });
