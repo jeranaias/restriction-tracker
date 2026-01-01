@@ -145,15 +145,25 @@ const App = {
     document.getElementById('help-ok-btn').addEventListener('click', () => this.hideHelpModal());
 
     // Welcome modal
-    document.getElementById('welcome-start-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.hideWelcomeModal();
-    });
-    document.getElementById('welcome-demo-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.loadDemoData();
-      this.hideWelcomeModal();
-    });
+    const welcomeStartBtn = document.getElementById('welcome-start-btn');
+    const welcomeDemoBtn = document.getElementById('welcome-demo-btn');
+
+    if (welcomeStartBtn) {
+      welcomeStartBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.hideWelcomeModal();
+      });
+    }
+
+    if (welcomeDemoBtn) {
+      welcomeDemoBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.hideWelcomeModal();
+        this.loadDemoData();
+      });
+    }
 
     // Bottom navigation
     document.getElementById('nav-roster').addEventListener('click', () => {
