@@ -5,6 +5,27 @@ All notable changes to the Restriction Tracker will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-12-31
+
+### Added
+- **Bottom Navigation Bar** - Fixed navigation with Roster, Sign In, Reports, and Settings tabs
+- **Quick Sign-In** - Auto-selects next due muster when tapping Sign In tab
+- **S1 Implementation Guide** - Comprehensive README section for unit deployment
+- **Practical Workflow Documentation** - Daily, weekly, and turnover procedures
+
+### Changed
+- **Improved Navigation** - Clear visual hierarchy with persistent bottom nav
+- **Streamlined UX** - Faster access to common tasks via bottom bar
+- **Updated README** - S1-focused implementation guide with setup options
+
+### Technical
+- Added `showQuickSignIn()` method for intelligent muster selection
+- Bottom nav active state updates with view changes
+- Form view hides bottom nav for cleaner editing experience
+- Service worker version bumped to 1.2.0
+
+---
+
 ## [1.1.0] - 2025-12-31
 
 ### Added

@@ -4,7 +4,7 @@
  * Version 1.1.0
  */
 const App = {
-  VERSION: '1.1.0',
+  VERSION: '1.2.0',
   FIRST_RUN_KEY: 'restriction-tracker-welcomed',
 
   // Current state
@@ -130,6 +130,22 @@ const App = {
       this.hideWelcomeModal();
     });
 
+    // Bottom navigation
+    document.getElementById('nav-roster').addEventListener('click', () => {
+      this.showRosterView();
+      this.updateBottomNav('roster');
+    });
+    document.getElementById('nav-signin').addEventListener('click', () => {
+      this.showQuickSignIn();
+    });
+    document.getElementById('nav-reports').addEventListener('click', () => {
+      this.showReportView();
+      this.updateBottomNav('reports');
+    });
+    document.getElementById('nav-settings').addEventListener('click', () => {
+      this.showSettingsModal();
+    });
+
     // Close modals on overlay click
     document.getElementById('settings-modal').addEventListener('click', (e) => {
       if (e.target.id === 'settings-modal') this.hideSettingsModal();
@@ -228,6 +244,89 @@ const App = {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('view--active'));
     document.getElementById(viewId).classList.add('view--active');
     this.currentView = viewId.replace('-view', '');
+
+    // Toggle form-active class for hiding bottom nav
+    if (viewId === 'form-view') {
+      document.body.classList.add('form-active');
+    } else {
+      document.body.classList.remove('form-active');
+    }
+
+    // Update bottom nav active state
+    const navMap = {
+      'roster-view': 'roster',
+      'signin-view': 'signin',
+      'detail-view': 'roster',
+      'form-view': 'roster',
+      'report-view': 'reports'
+    };
+    this.updateBottomNav(navMap[viewId] || 'roster');
+  },
+
+  /**
+   * Update bottom navigation active state
+   */
+  updateBottomNav(activeTab) {
+    document.querySelectorAll('.bottom-nav__item').forEach(item => {
+      item.classList.remove('bottom-nav__item--active');
+    });
+    const activeItem = document.getElementById(`nav-${activeTab}`);
+    if (activeItem) {
+      activeItem.classList.add('bottom-nav__item--active');
+    }
+  },
+
+  /**
+   * Show quick sign-in - shows first person needing a muster or roster if none
+   */
+  showQuickSignIn() {
+    const active = Roster.getAll().filter(r => r.active);
+    if (active.length === 0) {
+      this.showToast('Add restrictees first to use quick sign-in', 'info');
+      this.showRosterView();
+      return;
+    }
+
+    // Find someone who needs a muster soon
+    const now = new Date();
+    const currentTime = DateUtils.formatTime(now);
+    let targetRestrictee = null;
+    let targetMusterTime = null;
+
+    // First try to find someone with an upcoming muster within the hour
+    for (const r of active) {
+      for (const time of r.musterTimes) {
+        const [h, m] = time.split(':').map(Number);
+        const musterMinutes = h * 60 + m;
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        const diff = musterMinutes - currentMinutes;
+
+        // Within the next hour or just passed (within 30 min)
+        if (diff >= -30 && diff <= 60) {
+          // Check if not already signed in for this time today
+          const musters = MusterLog.getForRestrictee(r.id);
+          const today = DateUtils.today();
+          const alreadySigned = musters.some(m =>
+            m.date === today && m.scheduledTime === time
+          );
+
+          if (!alreadySigned) {
+            targetRestrictee = r;
+            targetMusterTime = time;
+            break;
+          }
+        }
+      }
+      if (targetRestrictee) break;
+    }
+
+    if (targetRestrictee) {
+      this.showSignInView(targetRestrictee.id, targetMusterTime);
+    } else {
+      // No urgent musters, show first active person with their first muster time
+      const first = active[0];
+      this.showSignInView(first.id, first.musterTimes[0]);
+    }
   },
 
   /**

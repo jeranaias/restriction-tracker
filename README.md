@@ -6,6 +6,113 @@ Digital muster log for personnel on restriction or EPD punishment. A mobile-frie
 
 ---
 
+## S1 Implementation Guide
+
+This section explains how to deploy and use Restriction Tracker in your unit's administrative workflow.
+
+### Who Should Use This Tool
+
+- **S1 Admin Clerks** - Primary operators who maintain the roster and run reports
+- **Duty NCOs/Officers** - Personnel conducting restriction musters
+- **Legal/Adjutant** - Reviewing muster compliance for NJP documentation
+
+### Recommended Setup
+
+#### Option A: Shared Duty Phone/Tablet (Recommended)
+1. Use a dedicated duty device (phone or tablet)
+2. Install the app to the home screen for quick access
+3. All duty personnel use the same device
+4. Export data weekly as backup
+
+#### Option B: Desktop Computer in S1
+1. Open the app in Chrome/Edge on the S1 duty computer
+2. Bookmark for quick access
+3. All restriction musters recorded on this single machine
+4. Export data at end of each week
+
+#### Option C: Multiple Devices with Sync
+1. Designate one device as the "master"
+2. Other devices can be used during the day
+3. At end of day, export from all devices
+4. Import consolidated data to master device
+5. More complex but allows distributed musters
+
+### Initial Setup Steps
+
+1. **Open the app** - Go to https://jeranaias.github.io/restriction-tracker/
+2. **Install to device** - Add to home screen (mobile) or bookmark (desktop)
+3. **Configure unit settings**:
+   - Tap **Settings** in the bottom nav
+   - Enter your unit name (e.g., "1st Bn, 5th Marines")
+   - Set default recorder name (e.g., "Duty NCO")
+4. **Add your restrictees**:
+   - Tap **Roster** → **Add Person**
+   - Enter their information from the Page 11/NJP paperwork
+   - Set the correct muster times per their restriction order
+
+### Daily Workflow
+
+#### Morning (Before First Muster)
+
+1. Open the app
+2. Check the roster - cards show who needs to muster and when
+3. Restrictees with upcoming musters show an alert badge
+
+#### At Each Muster Time
+
+1. Tap **Sign In** in the bottom nav (auto-selects next due muster)
+   - Or tap **Sign In** on a specific person's card
+2. When restrictee arrives:
+   - Tap **PRESENT** (green) if on time
+   - Tap **LATE** (yellow) if after scheduled time - add note
+   - Tap **MISSED** (red) if no-show - add note
+   - Tap **EXCUSED** if authorized absence - add note with authorization
+3. Enter who recorded the muster (auto-fills from settings)
+4. Muster is logged with timestamp
+
+#### End of Day
+
+1. Go to **Reports** in the bottom nav
+2. Review the daily log for completeness
+3. Tap **Export PDF** to generate a printable report
+4. File the PDF with your restriction paperwork
+
+### Navigation
+
+The app has a **bottom navigation bar** with four sections:
+
+| Tab | Purpose |
+|-----|---------|
+| **Roster** | View all restrictees, add new people, see muster status |
+| **Sign In** | Quick sign-in for next due muster |
+| **Reports** | Daily muster reports with PDF export |
+| **Settings** | Unit configuration, data backup, theme |
+
+### Weekly Duties
+
+- **Export backup** - Settings → Export Data → Save the JSON file
+- **Review missed musters** - Reports → check for patterns
+- **Update roster** - Remove completed restrictions, add new ones
+
+### Turnover Procedures
+
+When rotating duty or transferring responsibility:
+
+1. **Export all data**: Settings → Export Data
+2. **Save the JSON file** to the unit shared drive
+3. **Brief the relief** on current restrictees and any pending issues
+4. **New person imports data**: Settings → Import Data (if using new device)
+
+### Generating Reports for Legal/Adjutant
+
+1. Go to **Reports** in bottom nav
+2. Select the date you need
+3. Tap **Export PDF**
+4. This creates a log showing all musters for that day with timestamps
+5. For individual history: Roster → tap person → **Export PDF**
+
+---
+
 ## Features
 
 ### Core Functionality
@@ -62,7 +169,7 @@ On first launch, you'll see a welcome screen with options to:
 
 ### Adding a Restrictee
 
-1. Click **Add Person** on the main roster screen
+1. Go to **Roster** (bottom nav) and tap **Add Person**
 2. Enter personal information:
    - Rank (select from dropdown)
    - Last Name, First Name, Middle Initial
@@ -72,35 +179,38 @@ On first launch, you'll see a welcome screen with options to:
    - **EPD** - Extra Punitive Duty
    - **Correctional Custody** - Confinement to quarters
 4. Set start date and total days awarded
-5. Configure required muster times (0000-2359 format)
-6. Click **Save**
+5. Configure required muster times (standard: 0600, 1200, 1800, 2200)
+6. Tap **Save**
 
 ### Recording Musters
 
-1. Click **Sign In** on the restrictee's card
+1. Tap **Sign In** in bottom nav (goes to next due muster)
+   - Or tap **Sign In** on a specific person's roster card
 2. Select the appropriate status:
-   | Status | When to Use |
-   |--------|-------------|
-   | **Present** | On time at muster |
-   | **Late** | Arrived after scheduled time |
-   | **Missed** | Did not appear |
-   | **Excused** | Absent with authorization |
+
+| Status | When to Use | Notes Required |
+|--------|-------------|----------------|
+| **Present** | On time at muster | No |
+| **Late** | Arrived after scheduled time | Yes |
+| **Missed** | Did not appear | Yes |
+| **Excused** | Absent with authorization | Yes |
+
 3. Enter recorder's name (who is recording the muster)
-4. Add notes if required (mandatory for Late/Missed/Excused)
-5. Click **Submit**
+4. Add notes if required
+5. Tap the status button to submit
 
 ### Viewing History
 
-1. Click on a restrictee's card to view their detail page
-2. Click **View Log** to see complete muster history
+1. Tap on a restrictee's card to view their detail page
+2. See all muster entries grouped by date
 3. Use **Export PDF** to generate a printable report
 
 ### Generating Reports
 
 | Report Type | How to Generate |
 |-------------|-----------------|
-| **Daily Report** | Settings > View Daily Report > Export PDF |
-| **Individual History** | Click restrictee > View Log > Export PDF |
+| **Daily Report** | Reports (bottom nav) → Select date → Export PDF |
+| **Individual History** | Roster → Tap person → Export PDF |
 
 ---
 
@@ -109,7 +219,7 @@ On first launch, you'll see a welcome screen with options to:
 | Key | Action |
 |-----|--------|
 | `N` | Add new person |
-| `R` | Go to roster view |
+| `R` | Go to daily report |
 | `S` | Open settings |
 | `T` | Toggle theme (Light/Dark/Night) |
 | `?` | Show keyboard shortcuts |
@@ -117,72 +227,16 @@ On first launch, you'll see a welcome screen with options to:
 
 ---
 
-## Technical Details
-
-### Architecture
-
-- **Pure JavaScript** - No framework dependencies
-- **Modular Design** - Separate modules for roster, muster, reports, and utilities
-- **LocalStorage** - All data persisted in browser storage
-- **Service Worker** - Cache-first strategy for offline support
-- **jsPDF** - Bundled locally for offline PDF generation
-
-### File Structure
-
-```
-restriction-tracker/
-├── index.html          # Main application
-├── manifest.json       # PWA manifest
-├── service-worker.js   # Offline support
-├── css/
-│   └── styles.css      # USMC Design System
-├── js/
-│   ├── app.js          # Main controller
-│   ├── roster.js       # Roster management
-│   ├── muster.js       # Muster operations
-│   ├── reports.js      # PDF generation
-│   └── lib/
-│       ├── storage.js  # LocalStorage wrapper
-│       ├── date-utils.js # Date formatting
-│       └── theme.js    # Theme management
-├── lib/
-│   └── jspdf.umd.min.js # PDF library
-└── assets/
-    ├── icon-192.svg    # App icons
-    └── icon-512.svg
-```
-
-### Browser Support
-
-| Browser | Minimum Version |
-|---------|-----------------|
-| Chrome/Edge | 80+ |
-| Firefox | 75+ |
-| Safari | 13+ |
-| iOS Safari | 13+ |
-| Chrome Android | 80+ |
-
----
-
 ## Data Storage
 
 All data is stored locally in your browser's LocalStorage. Data does **not** sync between devices and is **not** transmitted over the internet.
 
-### Data Keys
-
-| Key | Contents |
-|-----|----------|
-| `restrictees` | Roster of personnel |
-| `musters` | All muster records |
-| `theme` | Current theme preference |
-| `restriction-tracker-welcomed` | First-run flag |
-
 ### Backup & Restore
 
-1. **Export**: Settings > Export Data (downloads JSON file)
-2. **Import**: Settings > Import Data (select JSON file)
+1. **Export**: Settings → Export Data (downloads JSON file)
+2. **Import**: Settings → Import Data (select JSON file)
 
-**Recommendation**: Export data regularly to prevent loss from browser data clearing.
+**Important**: Export data regularly. Browser data can be lost by clearing history or device issues.
 
 ---
 
@@ -194,44 +248,43 @@ All data is stored locally in your browser's LocalStorage. Data does **not** syn
 | JAGINST 5800.7G | Manual of the Judge Advocate General |
 | MCM Part V | Rules for Courts-Martial, Non-Judicial Punishment |
 | MCO 5800.16 | Legal Support and Administration Manual |
-| BUPERSINST 1620.6 | Navy Regional Restriction Barracks |
 
 ---
 
 ## FAQ
 
+### For S1 Shops
+
+**Q: Can the S1 Chief and Admin Clerk both use this at the same time?**
+A: If on different devices, each has separate data. Designate one device as the master for official records. You can export/import to merge data if needed.
+
+**Q: What happens when a restrictee finishes their restriction?**
+A: Tap their card → End Restriction. They move to the "Completed" section at the bottom of the roster and can be deleted when no longer needed.
+
+**Q: How do I print a log for Legal?**
+A: Reports → Select date → Export PDF. This creates a printable PDF with all muster entries and timestamps.
+
+**Q: We have multiple duty sections running musters. How do we consolidate?**
+A: Each section exports their data at end of duty. The primary S1 clerk imports all files to create a master record. Or use one shared device for all musters.
+
 ### General
 
 **Q: Does my data sync between devices?**
-A: No. All data is stored locally in your browser. Use Export/Import to transfer data between devices.
+A: No. All data is stored locally. Use Export/Import to transfer between devices.
 
 **Q: Can I use this offline?**
-A: Yes. After the first visit, the app works completely offline. Install it to your home screen for the best experience.
+A: Yes. After the first visit, works completely offline. Install to home screen for best experience.
 
 **Q: Is my data secure?**
-A: Data never leaves your device. There are no servers, no accounts, and no data transmission.
-
-### Usage
-
-**Q: What if someone signs in late?**
-A: Select "Late" status when recording the muster. You'll be prompted to add a note explaining the reason.
-
-**Q: Can I edit a muster record?**
-A: Currently, muster records cannot be edited after submission to maintain log integrity. Add a new entry with notes if corrections are needed.
-
-**Q: How do I remove someone who completed their restriction?**
-A: Click on their card, scroll down, and click "Delete". This removes them and all their muster history.
+A: Data never leaves your device. No servers, no accounts, no transmission.
 
 ### Technical
 
 **Q: Why isn't the app installing on my phone?**
-A: Make sure you're using HTTPS (the live demo link) and a supported browser. Look for "Add to Home Screen" in your browser menu.
+A: Use the live demo link (HTTPS required). Look for "Add to Home Screen" in your browser menu.
 
 **Q: My data disappeared. What happened?**
-A: Browser data can be cleared by clearing browsing history, private browsing mode, or storage pressure. Always export backups regularly.
-
-**Q: Can multiple people use this simultaneously?**
-A: Each device has its own local data. For shared access, one device should be designated as the primary tracker, or use Export/Import to sync.
+A: Browser data can be cleared by clearing history, private browsing, or storage pressure. Always export backups.
 
 ---
 
@@ -243,7 +296,7 @@ This tool was inspired by feedback from the r/USMC community:
 |-------------|----------|--------------|
 | **quickdraw_** | r/USMC | Requested restriction sign-in paperwork generator - noted 2016 Excel sheets still in use |
 
-*This tool exists because Marines took the time to share their pain points. Thank you.*
+*This tool exists because Marines took the time to share their pain points.*
 
 ---
 
