@@ -4,7 +4,7 @@
  * Version 1.1.0
  */
 
-const CACHE_NAME = 'restriction-tracker-v1.3.0';
+const CACHE_NAME = 'restriction-tracker-v1.4.0';
 const urlsToCache = [
   './',
   './index.html',

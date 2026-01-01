@@ -1,10 +1,41 @@
 /**
  * Main application for Restriction Tracker
  * Initializes and coordinates all modules
- * Version 1.1.0
+ * Version 1.4.0
  */
+
+/**
+ * PWA Install prompt handling
+ */
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const installBtn = document.getElementById('pwa-install-btn');
+  if (installBtn) {
+    installBtn.style.display = 'inline-block';
+  }
+});
+
+function installPWA() {
+  if (!deferredInstallPrompt) {
+    alert('To install: Use your browser menu and select "Add to Home Screen" or "Install App"');
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then((choiceResult) => {
+    deferredInstallPrompt = null;
+    const installBtn = document.getElementById('pwa-install-btn');
+    if (installBtn) {
+      installBtn.style.display = 'none';
+    }
+  });
+}
+
 const App = {
-  VERSION: '1.3.0',
+  VERSION: '1.4.0',
+  installPWA,
   FIRST_RUN_KEY: 'restriction-tracker-welcomed',
 
   // Current state
@@ -73,6 +104,12 @@ const App = {
    * Bind all event listeners
    */
   bindEvents() {
+    // PWA install button
+    const pwaInstallBtn = document.getElementById('pwa-install-btn');
+    if (pwaInstallBtn) {
+      pwaInstallBtn.addEventListener('click', () => this.installPWA());
+    }
+
     // Header buttons
     document.getElementById('settings-btn').addEventListener('click', () => this.showSettingsModal());
     document.getElementById('theme-btn').addEventListener('click', () => ThemeManager.toggle());
