@@ -4,7 +4,7 @@
  * Version 1.1.0
  */
 const App = {
-  VERSION: '1.2.0',
+  VERSION: '1.3.0',
   FIRST_RUN_KEY: 'restriction-tracker-welcomed',
 
   // Current state
@@ -45,7 +45,28 @@ const App = {
     // Online/offline detection
     this.setupOfflineDetection();
 
+    // Scroll detection for header shadow
+    this.setupScrollDetection();
+
     console.log(`Restriction Tracker v${this.VERSION} initialized`);
+  },
+
+  /**
+   * Setup scroll detection for header shadow
+   */
+  setupScrollDetection() {
+    const header = document.querySelector('.header');
+    let lastScrollY = 0;
+
+    window.addEventListener('scroll', () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > 10) {
+        header.classList.add('header--scrolled');
+      } else {
+        header.classList.remove('header--scrolled');
+      }
+      lastScrollY = currentScrollY;
+    }, { passive: true });
   },
 
   /**
@@ -434,6 +455,55 @@ const App = {
     } else {
       completedSection.classList.add('hidden');
     }
+
+    // Update pending muster badge
+    this.updatePendingMusterBadge();
+  },
+
+  /**
+   * Update the pending muster count badge on Sign In nav
+   */
+  updatePendingMusterBadge() {
+    const active = Roster.getAll().filter(r => r.active);
+    let pendingCount = 0;
+
+    const today = DateUtils.today();
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    active.forEach(r => {
+      r.musterTimes.forEach(time => {
+        const [h, m] = time.split(':').map(Number);
+        const musterMinutes = h * 60 + m;
+
+        // Count musters that are due now or overdue (within past 30 min) or coming up (next 60 min)
+        const diff = musterMinutes - currentMinutes;
+        if (diff >= -30 && diff <= 60) {
+          // Check if not already signed in
+          const musters = MusterLog.getForRestrictee(r.id);
+          const alreadySigned = musters.some(m =>
+            m.date === today && m.scheduledTime === time
+          );
+          if (!alreadySigned) {
+            pendingCount++;
+          }
+        }
+      });
+    });
+
+    const navSignIn = document.getElementById('nav-signin');
+    let badge = navSignIn.querySelector('.bottom-nav__badge');
+
+    if (pendingCount > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'bottom-nav__badge';
+        navSignIn.appendChild(badge);
+      }
+      badge.textContent = pendingCount;
+    } else if (badge) {
+      badge.remove();
+    }
   },
 
   /**
@@ -445,6 +515,23 @@ const App = {
     const daysText = daysRemaining > 0
       ? `${daysRemaining} of ${restrictee.daysAwarded} days remaining`
       : 'Restriction complete';
+
+    // Calculate progress percentage
+    const daysServed = restrictee.daysAwarded - daysRemaining;
+    const progressPercent = Math.min(100, Math.round((daysServed / restrictee.daysAwarded) * 100));
+    let progressClass = '';
+    if (progressPercent >= 80) progressClass = 'days-progress__bar--success';
+    else if (progressPercent >= 50) progressClass = 'days-progress__bar--warning';
+
+    // Determine card urgency class
+    let cardClass = 'roster-card';
+    if (!isCompleted && status.nextMuster) {
+      if (status.nextMuster.status === 'overdue' || status.nextMuster.status === 'due') {
+        cardClass += ' roster-card--urgent';
+      } else if (status.nextMuster.status === 'soon') {
+        cardClass += ' roster-card--soon';
+      }
+    }
 
     let nextMusterText = '';
     if (!isCompleted && status.nextMuster) {
@@ -469,13 +556,18 @@ const App = {
       ? `<button class="btn btn--success btn--sm signin-btn-action" data-id="${restrictee.id}" data-time="${status.nextMuster.time}">Sign In</button>`
       : '';
 
+    const progressBar = !isCompleted
+      ? `<div class="days-progress"><div class="days-progress__bar ${progressClass}" style="width: ${progressPercent}%"></div></div>`
+      : '';
+
     return `
-      <div class="roster-card fade-in" data-id="${restrictee.id}">
+      <div class="${cardClass}" data-id="${restrictee.id}">
         <div class="roster-card__header">
           <span class="roster-card__status ${status.statusClass}">${status.statusIcon}</span>
           <div class="roster-card__info">
             <h3 class="roster-card__name">${Roster.getDisplayName(restrictee)}${typeLabel}</h3>
             <p class="roster-card__meta">${daysText}</p>
+            ${progressBar}
             ${nextMusterText}
           </div>
         </div>

@@ -5,6 +5,30 @@ All notable changes to the Restriction Tracker will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-12-31
+
+### Added
+- **Pending Muster Badge** - Sign In nav shows count of musters due within the hour
+- **Progress Bars** - Visual progress indicator on roster cards showing days served
+- **Card Urgency States** - Cards highlight with colored borders for urgent/soon musters
+- **Scroll Shadow** - Header gains shadow effect when scrolling
+
+### Changed
+- **Enhanced Animations** - Smooth view transitions, staggered card animations, modal slide-up
+- **Touch Feedback** - Active states on mobile for buttons and cards
+- **Hover Effects** - Cards lift on hover with border color change
+- **Button Ripples** - Subtle ripple effect on button clicks
+- **Toast Animations** - Slide-in effect for notifications
+
+### Technical
+- Added CSS micro-interactions and polish layer
+- Implemented `updatePendingMusterBadge()` for real-time badge updates
+- Added `setupScrollDetection()` for header shadow on scroll
+- Respects `prefers-reduced-motion` for accessibility
+- Service worker version bumped to 1.3.0
+
+---
+
 ## [1.2.0] - 2025-12-31
 
 ### Added

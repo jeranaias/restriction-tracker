@@ -1727,6 +1727,333 @@ kbd {
 .text-xs { font-size: var(--text-xs); }
 .font-bold { font-weight: var(--font-bold); }
 
+/* ============================================
+   Polish & Micro-interactions
+   ============================================ */
+
+/* View transitions */
+.view {
+  opacity: 0;
+  transform: translateX(10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+
+.view--active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* Touch feedback for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .btn:active,
+  .roster-card:active,
+  .bottom-nav__item:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+
+  .signin-btn:active {
+    transform: scale(0.95);
+  }
+}
+
+/* Enhanced roster cards */
+.roster-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.roster-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary-light);
+}
+
+.roster-card--urgent {
+  border-left: 4px solid var(--error);
+  animation: urgentPulse 2s ease-in-out infinite;
+}
+
+.roster-card--soon {
+  border-left: 4px solid var(--warning);
+}
+
+@keyframes urgentPulse {
+  0%, 100% { border-left-color: var(--error); }
+  50% { border-left-color: rgba(239, 68, 68, 0.5); }
+}
+
+/* Progress indicator for days remaining */
+.days-progress {
+  height: 4px;
+  background: var(--bg-tertiary);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: var(--space-2);
+}
+
+.days-progress__bar {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.days-progress__bar--warning {
+  background: var(--warning);
+}
+
+.days-progress__bar--success {
+  background: var(--success);
+}
+
+/* Sign-in button enhancements */
+.signin-btn {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.signin-btn:hover {
+  transform: translateY(-2px);
+}
+
+.signin-btn--present:hover {
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.signin-btn--late:hover {
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.signin-btn--missed:hover {
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+/* Success feedback animation */
+@keyframes successPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.success-pop {
+  animation: successPop 0.3s ease;
+}
+
+/* Slide up animation for modals */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-overlay--active .modal {
+  animation: slideUp 0.25s ease;
+}
+
+/* Stagger animation for lists */
+.roster-card {
+  animation: fadeInUp 0.3s ease backwards;
+}
+
+.roster-card:nth-child(1) { animation-delay: 0.05s; }
+.roster-card:nth-child(2) { animation-delay: 0.1s; }
+.roster-card:nth-child(3) { animation-delay: 0.15s; }
+.roster-card:nth-child(4) { animation-delay: 0.2s; }
+.roster-card:nth-child(5) { animation-delay: 0.25s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Empty state animation */
+.empty-state {
+  animation: fadeIn 0.4s ease;
+}
+
+.empty-state svg {
+  animation: gentleBounce 3s ease-in-out infinite;
+}
+
+@keyframes gentleBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Toast slide in */
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.toast {
+  animation: toastSlideIn 0.3s ease;
+}
+
+/* Bottom nav hover states */
+.bottom-nav__item {
+  transition: color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
+}
+
+.bottom-nav__item:hover {
+  transform: translateY(-1px);
+}
+
+.bottom-nav__item--active {
+  position: relative;
+}
+
+.bottom-nav__item--active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 3px 3px 0 0;
+}
+
+/* Badge pulse for pending musters */
+.bottom-nav__badge {
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Focus visible for accessibility */
+.btn:focus-visible,
+.roster-card:focus-visible,
+.bottom-nav__item:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Header shadow on scroll */
+.header--scrolled {
+  box-shadow: var(--shadow-md);
+}
+
+/* Skeleton loading states */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 25%,
+    var(--bg-tertiary) 50%,
+    var(--bg-secondary) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite;
+  border-radius: var(--radius-md);
+}
+
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-text {
+  height: 1em;
+  width: 80%;
+  margin-bottom: var(--space-2);
+}
+
+.skeleton-text--short {
+  width: 40%;
+}
+
+/* Ripple effect for buttons */
+.btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.btn:active::after {
+  width: 200px;
+  height: 200px;
+}
+
+/* Status badges with icons */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  border-radius: var(--radius-full);
+}
+
+.status-badge--present {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.status-badge--late {
+  background: var(--warning-light);
+  color: #B45309;
+}
+
+.status-badge--missed {
+  background: var(--error-light);
+  color: var(--error);
+}
+
+.status-badge--excused {
+  background: var(--info-light);
+  color: var(--info);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Print improvements */
 @media print {
   .report-content {
