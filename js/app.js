@@ -586,22 +586,25 @@ const App = {
   bindRosterCardEvents() {
     document.querySelectorAll('.signin-btn-action').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const id = e.target.dataset.id;
-        const time = e.target.dataset.time;
+        e.stopPropagation();
+        const id = e.currentTarget.dataset.id;
+        const time = e.currentTarget.dataset.time;
         this.showSignInView(id, time);
       });
     });
 
     document.querySelectorAll('.view-log-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const id = e.target.dataset.id;
+        e.stopPropagation();
+        const id = e.currentTarget.dataset.id;
         this.showDetailView(id);
       });
     });
 
     document.querySelectorAll('.edit-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const id = e.target.dataset.id;
+        e.stopPropagation();
+        const id = e.currentTarget.dataset.id;
         this.showFormView(id);
       });
     });
