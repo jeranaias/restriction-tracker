@@ -145,8 +145,12 @@ const App = {
     document.getElementById('help-ok-btn').addEventListener('click', () => this.hideHelpModal());
 
     // Welcome modal
-    document.getElementById('welcome-start-btn').addEventListener('click', () => this.hideWelcomeModal());
-    document.getElementById('welcome-demo-btn').addEventListener('click', () => {
+    document.getElementById('welcome-start-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.hideWelcomeModal();
+    });
+    document.getElementById('welcome-demo-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
       this.loadDemoData();
       this.hideWelcomeModal();
     });
