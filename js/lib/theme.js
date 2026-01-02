@@ -3,7 +3,7 @@
  */
 const ThemeManager = {
   STORAGE_KEY: 'usmc-tools-theme',
-  THEMES: ['light', 'dark', 'night'],
+  THEMES: ['dark', 'light', 'night'],  // Dark is now the default
 
   /**
    * Initialize theme from storage or system preference
@@ -12,36 +12,32 @@ const ThemeManager = {
     const saved = localStorage.getItem(this.STORAGE_KEY);
     if (saved && this.THEMES.includes(saved)) {
       this.setTheme(saved);
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      this.setTheme('dark');
     } else {
-      this.setTheme('light');
+      // Default to dark mode
+      this.setTheme('dark');
     }
-
-    // Listen for system theme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      if (!localStorage.getItem(this.STORAGE_KEY)) {
-        this.setTheme(e.matches ? 'dark' : 'light');
-      }
-    });
   },
 
   /**
    * Set the current theme
-   * @param {string} theme - Theme name (light, dark, night)
+   * @param {string} theme - Theme name (dark, light, night)
    */
   setTheme(theme) {
     if (!this.THEMES.includes(theme)) {
-      theme = 'light';
+      theme = 'dark';
     }
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem(this.STORAGE_KEY, theme);
 
     // Update theme-color meta tag
-    const themeColor = theme === 'night' ? '#000000' : '#8B0000';
+    const themeColors = {
+      dark: '#5C1A1A',
+      light: '#8B0000',
+      night: '#0A0A0A'
+    };
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', themeColor);
+      metaThemeColor.setAttribute('content', themeColors[theme] || '#5C1A1A');
     }
   },
 
@@ -60,7 +56,7 @@ const ThemeManager = {
    * @returns {string} - Current theme name
    */
   getCurrent() {
-    return document.documentElement.getAttribute('data-theme') || 'light';
+    return document.documentElement.getAttribute('data-theme') || 'dark';
   },
 
   /**
@@ -70,11 +66,11 @@ const ThemeManager = {
    */
   getDisplayName(theme) {
     const names = {
-      light: 'Light',
       dark: 'Dark',
+      light: 'Light',
       night: 'Night (Tactical)'
     };
-    return names[theme] || 'Light';
+    return names[theme] || 'Dark';
   }
 };
 
