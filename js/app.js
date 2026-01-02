@@ -202,14 +202,6 @@ const App = {
       });
     }
 
-    // Top tabs navigation
-    document.querySelectorAll('.top-tabs__tab').forEach(tab => {
-      tab.addEventListener('click', (e) => {
-        const tabName = e.currentTarget.dataset.tab;
-        this.handleTabClick(tabName);
-      });
-    });
-
     // Close modals on overlay click
     document.getElementById('settings-modal').addEventListener('click', (e) => {
       if (e.target.id === 'settings-modal') this.hideSettingsModal();
@@ -309,63 +301,14 @@ const App = {
     document.getElementById(viewId).classList.add('view--active');
     this.currentView = viewId.replace('-view', '');
 
-    // Toggle form-active class for hiding bottom nav
+    // Toggle form-active class for styling
     if (viewId === 'form-view') {
       document.body.classList.add('form-active');
     } else {
       document.body.classList.remove('form-active');
     }
-
-    // Update bottom nav active state
-    const navMap = {
-      'roster-view': 'roster',
-      'signin-view': 'signin',
-      'detail-view': 'roster',
-      'form-view': 'roster',
-      'report-view': 'reports'
-    };
-    this.updateBottomNav(navMap[viewId] || 'roster');
   },
 
-  /**
-   * Handle top tab click
-   */
-  handleTabClick(tabName) {
-    switch (tabName) {
-      case 'roster':
-        this.showRosterView();
-        break;
-      case 'signin':
-        this.showQuickSignIn();
-        break;
-      case 'reports':
-        this.showReportView();
-        break;
-      case 'settings':
-        this.showSettingsModal();
-        break;
-    }
-  },
-
-  /**
-   * Update top tabs active state
-   */
-  updateTopTabs(activeTab) {
-    document.querySelectorAll('.top-tabs__tab').forEach(tab => {
-      tab.classList.remove('top-tabs__tab--active');
-    });
-    const activeTabEl = document.querySelector(`.top-tabs__tab[data-tab="${activeTab}"]`);
-    if (activeTabEl) {
-      activeTabEl.classList.add('top-tabs__tab--active');
-    }
-  },
-
-  /**
-   * Update navigation active state (alias for backward compatibility)
-   */
-  updateBottomNav(activeTab) {
-    this.updateTopTabs(activeTab);
-  },
 
   /**
    * Show quick sign-in - shows first person needing a muster or roster if none
@@ -531,46 +474,10 @@ const App = {
   },
 
   /**
-   * Update the pending muster count badge on Sign In nav
+   * Update the pending muster count (for future use)
    */
   updatePendingMusterBadge() {
-    const active = Roster.getAll().filter(r => r.active);
-    let pendingCount = 0;
-
-    const today = DateUtils.today();
-    const now = new Date();
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-    active.forEach(r => {
-      r.musterTimes.forEach(time => {
-        const [h, m] = time.split(':').map(Number);
-        const musterMinutes = h * 60 + m;
-
-        // Count musters that are due now or overdue (within past 30 min) or coming up (next 60 min)
-        const diff = musterMinutes - currentMinutes;
-        if (diff >= -30 && diff <= 60) {
-          // Check if not already signed in
-          const musters = MusterLog.getForRestrictee(r.id);
-          const alreadySigned = musters.some(m =>
-            m.date === today && m.scheduledTime === time
-          );
-          if (!alreadySigned) {
-            pendingCount++;
-          }
-        }
-      });
-    });
-
-    // Update top tabs badge
-    const signinBadge = document.getElementById('signin-badge');
-    if (signinBadge) {
-      if (pendingCount > 0) {
-        signinBadge.textContent = pendingCount;
-        signinBadge.style.display = 'flex';
-      } else {
-        signinBadge.style.display = 'none';
-      }
-    }
+    // Badge removed with tabs - urgent musters are shown via card styling
   },
 
   /**
@@ -620,7 +527,7 @@ const App = {
       : '';
 
     const signInBtn = !isCompleted && status.nextMuster
-      ? `<button class="btn btn--success btn--sm signin-btn-action" data-id="${restrictee.id}" data-time="${status.nextMuster.time}">Sign In</button>`
+      ? `<button class="btn btn--primary btn--sm signin-btn-action" data-id="${restrictee.id}" data-time="${status.nextMuster.time}">Sign In</button>`
       : '';
 
     const progressBar = !isCompleted
