@@ -16,21 +16,21 @@
   --text-primary: #E5E5E5;
   --text-secondary: #CCCCCC;
   --text-muted: #AAAAAA;
-  --accent-red: #DC4444;
+  --accent-red: #C41E3A;
   --accent-yellow: #EAB308;
-  --btn-primary: #DC4444;
+  --btn-primary: #C41E3A;
   --header-gradient-start: #5C1A1A;
   --header-gradient-end: #6C2A2A;
   --nav-bg: #2D2D2D;
-  --nav-active: #DC4444;
+  --nav-active: #C41E3A;
 
   /* Mapped to existing variable names for compatibility */
   --primary: #5C1A1A;
   --primary-dark: #4A1515;
   --primary-light: #6C2A2A;
-  --accent: #DC4444;
-  --accent-dark: #B93636;
-  --accent-light: #E85555;
+  --accent: #C41E3A;
+  --accent-dark: #A01830;
+  --accent-light: #D42E4A;
 
   /* Gold Accent */
   --gold: #EAB308;
@@ -337,6 +337,11 @@ body {
   flex-direction: column;
   align-items: center;
   gap: var(--space-1);
+}
+
+.header__logo {
+  font-size: var(--text-2xl);
+  line-height: 1;
 }
 
 .header__title {
