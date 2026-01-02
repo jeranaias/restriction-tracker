@@ -1,10 +1,10 @@
 /**
  * Service Worker for Restriction Tracker PWA
  * Enables offline functionality with cache-first strategy
- * Version 1.1.0
+ * Version 1.5.0
  */
 
-const CACHE_NAME = 'restriction-tracker-v1.4.0';
+const CACHE_NAME = 'restriction-tracker-v1.5.0';
 const urlsToCache = [
   './',
   './index.html',

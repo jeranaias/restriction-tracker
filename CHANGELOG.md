@@ -5,6 +5,28 @@ All notable changes to the Restriction Tracker will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-01-01
+
+### Changed
+- **New Design Pattern** - Updated to match OSMEAC/Award Write-up design language
+- **Centered Header** - Gradient header with centered title, gold subtitle
+- **Top Tabs Navigation** - Replaced bottom nav with underlined top tabs
+- **Gold Accent Cards** - Section cards now have gold/yellow left border indicator
+- **Section Titles** - ALL CAPS styling with gold color and helper text
+- **Theme Toggle** - Moved to top-right corner of header
+- **Tagline** - Added "Free tool for Marines" with documentation link
+
+### Technical
+- Added `.top-tabs` and `.top-tabs__tab` CSS components
+- Added `.tagline` component for documentation link
+- Updated `.header` with centered layout and theme toggle positioning
+- Updated `.card` with gold left border accent
+- Updated `.view__title` with gold color and uppercase styling
+- Hidden bottom navigation bar (legacy code preserved for compatibility)
+- Service worker version bumped to 1.5.0
+
+---
+
 ## [1.4.0] - 2026-01-01
 
 ### Added

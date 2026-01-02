@@ -34,7 +34,7 @@ function installPWA() {
 }
 
 const App = {
-  VERSION: '1.4.0',
+  VERSION: '1.5.0',
   installPWA,
   FIRST_RUN_KEY: 'restriction-tracker-welcomed',
 
@@ -202,19 +202,32 @@ const App = {
       });
     }
 
-    // Bottom navigation
-    document.getElementById('nav-roster').addEventListener('click', () => {
+    // Top tabs navigation
+    document.querySelectorAll('.top-tabs__tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        const tabName = e.currentTarget.dataset.tab;
+        this.handleTabClick(tabName);
+      });
+    });
+
+    // Bottom navigation (legacy, kept for compatibility)
+    const navRoster = document.getElementById('nav-roster');
+    const navSignin = document.getElementById('nav-signin');
+    const navReports = document.getElementById('nav-reports');
+    const navSettings = document.getElementById('nav-settings');
+
+    if (navRoster) navRoster.addEventListener('click', () => {
       this.showRosterView();
       this.updateBottomNav('roster');
     });
-    document.getElementById('nav-signin').addEventListener('click', () => {
+    if (navSignin) navSignin.addEventListener('click', () => {
       this.showQuickSignIn();
     });
-    document.getElementById('nav-reports').addEventListener('click', () => {
+    if (navReports) navReports.addEventListener('click', () => {
       this.showReportView();
       this.updateBottomNav('reports');
     });
-    document.getElementById('nav-settings').addEventListener('click', () => {
+    if (navSettings) navSettings.addEventListener('click', () => {
       this.showSettingsModal();
     });
 
@@ -336,9 +349,45 @@ const App = {
   },
 
   /**
-   * Update bottom navigation active state
+   * Handle top tab click
+   */
+  handleTabClick(tabName) {
+    switch (tabName) {
+      case 'roster':
+        this.showRosterView();
+        break;
+      case 'signin':
+        this.showQuickSignIn();
+        break;
+      case 'reports':
+        this.showReportView();
+        break;
+      case 'settings':
+        this.showSettingsModal();
+        break;
+    }
+  },
+
+  /**
+   * Update top tabs active state
+   */
+  updateTopTabs(activeTab) {
+    document.querySelectorAll('.top-tabs__tab').forEach(tab => {
+      tab.classList.remove('top-tabs__tab--active');
+    });
+    const activeTabEl = document.querySelector(`.top-tabs__tab[data-tab="${activeTab}"]`);
+    if (activeTabEl) {
+      activeTabEl.classList.add('top-tabs__tab--active');
+    }
+  },
+
+  /**
+   * Update bottom navigation active state (legacy)
    */
   updateBottomNav(activeTab) {
+    // Update top tabs as well
+    this.updateTopTabs(activeTab);
+
     document.querySelectorAll('.bottom-nav__item').forEach(item => {
       item.classList.remove('bottom-nav__item--active');
     });
@@ -542,18 +591,32 @@ const App = {
       });
     });
 
-    const navSignIn = document.getElementById('nav-signin');
-    let badge = navSignIn.querySelector('.bottom-nav__badge');
-
-    if (pendingCount > 0) {
-      if (!badge) {
-        badge = document.createElement('span');
-        badge.className = 'bottom-nav__badge';
-        navSignIn.appendChild(badge);
+    // Update top tabs badge
+    const signinBadge = document.getElementById('signin-badge');
+    if (signinBadge) {
+      if (pendingCount > 0) {
+        signinBadge.textContent = pendingCount;
+        signinBadge.style.display = 'flex';
+      } else {
+        signinBadge.style.display = 'none';
       }
-      badge.textContent = pendingCount;
-    } else if (badge) {
-      badge.remove();
+    }
+
+    // Also update bottom nav badge (legacy)
+    const navSignIn = document.getElementById('nav-signin');
+    if (navSignIn) {
+      let badge = navSignIn.querySelector('.bottom-nav__badge');
+
+      if (pendingCount > 0) {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'bottom-nav__badge';
+          navSignIn.appendChild(badge);
+        }
+        badge.textContent = pendingCount;
+      } else if (badge) {
+        badge.remove();
+      }
     }
   },
 

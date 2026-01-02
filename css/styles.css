@@ -245,56 +245,177 @@ body {
 }
 
 /* ============================================
-   Header
+   Header - Centered Design Pattern
    ============================================ */
 .header {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: var(--white);
-  padding: var(--space-4) 0;
+  padding: var(--space-6) var(--space-4);
   box-shadow: var(--shadow-md);
+  position: relative;
+  text-align: center;
 }
 
-.header__content {
+.header__center {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
+  gap: var(--space-1);
 }
 
 .header__title {
-  font-size: var(--text-xl);
+  font-size: var(--text-2xl);
   font-weight: var(--font-bold);
-  margin-bottom: var(--space-1);
+  letter-spacing: 0.05em;
+  margin: 0;
 }
 
 .header__subtitle {
-  font-size: var(--text-xs);
-  opacity: 0.9;
+  font-size: var(--text-sm);
+  color: var(--gold);
+  opacity: 1;
+  margin: 0;
 }
 
-.header__actions {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.header__actions .btn--ghost {
-  color: var(--white);
-}
-
-.header__actions .btn--ghost:hover {
+.header__theme-toggle {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
   background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  color: var(--white);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header__theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 @media (min-width: 640px) {
   .header {
-    padding: var(--space-6) 0;
+    padding: var(--space-8) var(--space-4);
   }
 
   .header__title {
-    font-size: var(--text-2xl);
+    font-size: var(--text-3xl);
   }
 
   .header__subtitle {
-    font-size: var(--text-sm);
+    font-size: var(--text-base);
+  }
+}
+
+/* ============================================
+   Tagline - "Free tool for Marines"
+   ============================================ */
+.tagline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-light);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.tagline__separator {
+  color: var(--text-tertiary);
+}
+
+.tagline__link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: var(--font-medium);
+}
+
+.tagline__link:hover {
+  text-decoration: underline;
+}
+
+/* ============================================
+   Top Tabs Navigation
+   ============================================ */
+.top-tabs {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-light);
+  flex-wrap: wrap;
+}
+
+.top-tabs__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  position: relative;
+}
+
+.top-tabs__tab:hover {
+  color: var(--text-primary);
+}
+
+.top-tabs__tab--active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.top-tabs__tab svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+}
+
+.top-tabs__badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: var(--error);
+  color: white;
+  font-size: 10px;
+  font-weight: var(--font-bold);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .top-tabs {
+    gap: 0;
+  }
+
+  .top-tabs__tab {
+    flex: 1;
+    justify-content: center;
+    padding: var(--space-3) var(--space-2);
+    font-size: var(--text-xs);
+  }
+
+  .top-tabs__tab svg {
+    width: 16px;
+    height: 16px;
   }
 }
 
@@ -327,9 +448,17 @@ body {
 }
 
 .view__title {
-  font-size: var(--text-xl);
-  font-weight: var(--font-semibold);
-  color: var(--text-primary);
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--gold-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.view__helper {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  margin-top: var(--space-1);
 }
 
 .view__back {
@@ -576,11 +705,12 @@ legend {
 }
 
 /* ============================================
-   Cards
+   Cards - with Gold Accent
    ============================================ */
 .card {
   background: var(--surface);
   border: 1px solid var(--border-light);
+  border-left: 4px solid var(--gold);
   border-radius: var(--radius-lg);
   padding: var(--space-4);
   box-shadow: var(--shadow-sm);
@@ -591,6 +721,10 @@ legend {
   box-shadow: var(--shadow-md);
 }
 
+.card--no-accent {
+  border-left: 1px solid var(--border-light);
+}
+
 .card__header {
   margin-bottom: var(--space-3);
   padding-bottom: var(--space-3);
@@ -598,9 +732,11 @@ legend {
 }
 
 .card__title {
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
-  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--gold-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .card__subtitle {
@@ -1334,14 +1470,14 @@ legend {
 }
 
 /* ============================================
-   Bottom Navigation
+   Bottom Navigation (Hidden - using top tabs now)
    ============================================ */
 .bottom-nav {
+  display: none;
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  display: flex;
   justify-content: space-around;
   align-items: stretch;
   background: var(--surface);
@@ -1417,17 +1553,8 @@ legend {
   position: relative;
 }
 
-/* Adjust main content for bottom nav */
+/* Main content padding - no bottom nav needed */
 .main-content {
-  padding-bottom: 80px;
-}
-
-/* Hide bottom nav when in form view */
-body.form-active .bottom-nav {
-  display: none;
-}
-
-body.form-active .main-content {
   padding-bottom: var(--space-4);
 }
 
@@ -1436,7 +1563,7 @@ body.form-active .main-content {
    ============================================ */
 .footer {
   margin-top: var(--space-12);
-  margin-bottom: 80px;
+  margin-bottom: 0;
   padding: var(--space-8) 0;
   border-top: 1px solid var(--border-light);
   background: var(--bg-secondary);
