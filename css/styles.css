@@ -12,6 +12,11 @@
   --primary-dark: #6B0000;
   --primary-light: #A52A2A;
 
+  /* Accent Colors - Coral/Red for buttons */
+  --accent: #DC2626;
+  --accent-dark: #B91C1C;
+  --accent-light: #EF4444;
+
   /* Secondary Colors */
   --secondary: #003366;
   --secondary-dark: #002244;
@@ -331,7 +336,7 @@ body {
 }
 
 .tagline__link {
-  color: var(--primary);
+  color: var(--accent);
   text-decoration: none;
   font-weight: var(--font-medium);
 }
@@ -374,8 +379,8 @@ body {
 }
 
 .top-tabs__tab--active {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 .top-tabs__tab svg {
@@ -501,12 +506,12 @@ body {
 }
 
 .btn--primary {
-  background: var(--primary);
+  background: var(--accent);
   color: var(--white);
 }
 
 .btn--primary:hover:not(:disabled) {
-  background: var(--primary-dark);
+  background: var(--accent-dark);
 }
 
 .btn--secondary {
@@ -1214,7 +1219,10 @@ legend {
   border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
-  background: var(--surface);
+  background: var(--white);
+  box-shadow: var(--shadow-md);
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .report-header {
@@ -1532,7 +1540,7 @@ legend {
 }
 
 .footer a {
-  color: var(--primary);
+  color: var(--accent);
   text-decoration: none;
 }
 
@@ -2007,7 +2015,7 @@ kbd {
 .btn:focus-visible,
 .roster-card:focus-visible,
 .top-tabs__tab:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
