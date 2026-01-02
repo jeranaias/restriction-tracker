@@ -423,7 +423,7 @@ body {
    Main Content
    ============================================ */
 .main-content {
-  padding: var(--space-6) 0;
+  padding: var(--space-6) 0 var(--space-4);
   min-height: calc(100vh - 200px);
 }
 
@@ -1470,93 +1470,55 @@ legend {
 }
 
 /* ============================================
-   Bottom Navigation (Hidden - using top tabs now)
+   Alerts
    ============================================ */
-.bottom-nav {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  justify-content: space-around;
-  align-items: stretch;
-  background: var(--surface);
-  border-top: 1px solid var(--border-light);
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 100;
-  padding-bottom: env(safe-area-inset-bottom, 0);
-}
-
-.bottom-nav__item {
-  flex: 1;
+.alert {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-1);
-  padding: var(--space-3) var(--space-2);
-  background: none;
-  border: none;
-  color: var(--text-tertiary);
-  font-size: var(--text-xs);
-  font-weight: var(--font-medium);
-  text-decoration: none;
-  cursor: pointer;
-  transition: color 0.15s ease, background-color 0.15s ease;
-  min-height: 60px;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
 }
 
-.bottom-nav__item:hover {
-  background: var(--surface-hover);
-  color: var(--text-primary);
+.alert svg {
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
-.bottom-nav__item--active {
-  color: var(--primary);
+.alert--info {
+  background: var(--info-light);
+  color: var(--secondary);
+  border: 1px solid var(--info);
 }
 
-.bottom-nav__item--active svg {
-  stroke: var(--primary);
+.alert--info svg {
+  stroke: var(--info);
 }
 
-.bottom-nav__item svg {
-  width: 24px;
-  height: 24px;
-  stroke: currentColor;
-  stroke-width: 2;
-  fill: none;
+.alert--warning {
+  background: var(--warning-light);
+  color: var(--gray-800);
+  border: 1px solid var(--warning);
 }
 
-.bottom-nav__label {
-  line-height: 1;
+.alert--warning svg {
+  stroke: var(--warning);
 }
 
-/* Badge on nav item */
-.bottom-nav__badge {
-  position: absolute;
-  top: 4px;
-  right: calc(50% - 20px);
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  background: var(--error);
-  color: white;
-  font-size: 10px;
-  font-weight: var(--font-bold);
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.alert--success {
+  background: var(--success-light);
+  color: var(--gray-800);
+  border: 1px solid var(--success);
 }
 
-.bottom-nav__item {
-  position: relative;
+.alert--error {
+  background: var(--error-light);
+  color: var(--gray-800);
+  border: 1px solid var(--error);
 }
 
-/* Main content padding - no bottom nav needed */
-.main-content {
-  padding-bottom: var(--space-4);
-}
+/* Bottom navigation styles removed - using top tabs now */
 
 /* ============================================
    Footer
@@ -1849,10 +1811,7 @@ kbd {
 }
 
 /* Additional utility classes */
-.mb-4 { margin-bottom: var(--space-4); }
-.mt-4 { margin-top: var(--space-4); }
 .text-xs { font-size: var(--text-xs); }
-.font-bold { font-weight: var(--font-bold); }
 
 /* ============================================
    Polish & Micro-interactions
@@ -2034,33 +1993,8 @@ kbd {
   animation: toastSlideIn 0.3s ease;
 }
 
-/* Bottom nav hover states */
-.bottom-nav__item {
-  transition: color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
-}
-
-.bottom-nav__item:hover {
-  transform: translateY(-1px);
-}
-
-.bottom-nav__item--active {
-  position: relative;
-}
-
-.bottom-nav__item--active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 24px;
-  height: 3px;
-  background: var(--primary);
-  border-radius: 3px 3px 0 0;
-}
-
 /* Badge pulse for pending musters */
-.bottom-nav__badge {
+.top-tabs__badge {
   animation: badgePulse 2s ease-in-out infinite;
 }
 
@@ -2072,7 +2006,7 @@ kbd {
 /* Focus visible for accessibility */
 .btn:focus-visible,
 .roster-card:focus-visible,
-.bottom-nav__item:focus-visible {
+.top-tabs__tab:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }

@@ -210,27 +210,6 @@ const App = {
       });
     });
 
-    // Bottom navigation (legacy, kept for compatibility)
-    const navRoster = document.getElementById('nav-roster');
-    const navSignin = document.getElementById('nav-signin');
-    const navReports = document.getElementById('nav-reports');
-    const navSettings = document.getElementById('nav-settings');
-
-    if (navRoster) navRoster.addEventListener('click', () => {
-      this.showRosterView();
-      this.updateBottomNav('roster');
-    });
-    if (navSignin) navSignin.addEventListener('click', () => {
-      this.showQuickSignIn();
-    });
-    if (navReports) navReports.addEventListener('click', () => {
-      this.showReportView();
-      this.updateBottomNav('reports');
-    });
-    if (navSettings) navSettings.addEventListener('click', () => {
-      this.showSettingsModal();
-    });
-
     // Close modals on overlay click
     document.getElementById('settings-modal').addEventListener('click', (e) => {
       if (e.target.id === 'settings-modal') this.hideSettingsModal();
@@ -382,19 +361,10 @@ const App = {
   },
 
   /**
-   * Update bottom navigation active state (legacy)
+   * Update navigation active state (alias for backward compatibility)
    */
   updateBottomNav(activeTab) {
-    // Update top tabs as well
     this.updateTopTabs(activeTab);
-
-    document.querySelectorAll('.bottom-nav__item').forEach(item => {
-      item.classList.remove('bottom-nav__item--active');
-    });
-    const activeItem = document.getElementById(`nav-${activeTab}`);
-    if (activeItem) {
-      activeItem.classList.add('bottom-nav__item--active');
-    }
   },
 
   /**
@@ -599,23 +569,6 @@ const App = {
         signinBadge.style.display = 'flex';
       } else {
         signinBadge.style.display = 'none';
-      }
-    }
-
-    // Also update bottom nav badge (legacy)
-    const navSignIn = document.getElementById('nav-signin');
-    if (navSignIn) {
-      let badge = navSignIn.querySelector('.bottom-nav__badge');
-
-      if (pendingCount > 0) {
-        if (!badge) {
-          badge = document.createElement('span');
-          badge.className = 'bottom-nav__badge';
-          navSignIn.appendChild(badge);
-        }
-        badge.textContent = pendingCount;
-      } else if (badge) {
-        badge.remove();
       }
     }
   },
