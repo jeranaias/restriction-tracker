@@ -34,7 +34,7 @@ function installPWA() {
 }
 
 const App = {
-  VERSION: '1.5.0',
+  VERSION: '1.6.0',
   installPWA,
   FIRST_RUN_KEY: 'restriction-tracker-welcomed',
 
