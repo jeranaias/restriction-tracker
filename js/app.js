@@ -111,8 +111,16 @@ const App = {
     }
 
     // Header buttons
-    document.getElementById('settings-btn').addEventListener('click', () => this.showSettingsModal());
+    document.getElementById('settings-btn')?.addEventListener('click', () => this.showSettingsModal());
     document.getElementById('theme-btn').addEventListener('click', () => ThemeManager.toggle());
+
+    // Top tab navigation
+    document.querySelectorAll('.top-tabs__tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        const tabName = e.currentTarget.dataset.tab;
+        this.switchTab(tabName);
+      });
+    });
 
     // Add person buttons
     document.getElementById('add-person-btn').addEventListener('click', () => this.showFormView());
@@ -309,6 +317,34 @@ const App = {
     }
   },
 
+  /**
+   * Switch to a tab (Roster, Sign In, Reports, Settings)
+   */
+  switchTab(tabName) {
+    // Update tab buttons
+    document.querySelectorAll('.top-tabs__tab').forEach(tab => {
+      tab.classList.remove('top-tabs__tab--active');
+      if (tab.dataset.tab === tabName) {
+        tab.classList.add('top-tabs__tab--active');
+      }
+    });
+
+    // Handle the view change
+    switch (tabName) {
+      case 'roster':
+        this.showRosterView();
+        break;
+      case 'signin':
+        this.showQuickSignIn();
+        break;
+      case 'reports':
+        this.showReportView();
+        break;
+      case 'settings':
+        this.showSettingsModal();
+        break;
+    }
+  },
 
   /**
    * Show quick sign-in - shows first person needing a muster or roster if none

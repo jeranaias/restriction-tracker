@@ -401,6 +401,67 @@ body {
   text-decoration: underline;
 }
 
+/* ============================================
+   Top Navigation Tabs
+   ============================================ */
+.top-tabs {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--border-input);
+  flex-wrap: wrap;
+}
+
+.top-tabs__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  position: relative;
+}
+
+.top-tabs__tab:hover {
+  color: var(--text-primary);
+}
+
+.top-tabs__tab--active {
+  color: var(--nav-active);
+  border-bottom-color: var(--nav-active);
+}
+
+.top-tabs__tab svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+}
+
+@media (max-width: 480px) {
+  .top-tabs {
+    gap: 0;
+  }
+
+  .top-tabs__tab {
+    flex: 1;
+    justify-content: center;
+    padding: var(--space-3) var(--space-2);
+    font-size: var(--text-xs);
+  }
+
+  .top-tabs__tab svg {
+    width: 16px;
+    height: 16px;
+  }
+}
 
 /* ============================================
    Main Content
